@@ -2,6 +2,7 @@ Getting & Cleaning Data - Course Project
 ========================================
 
 This script assumes following packages are installed and loaded:
+
 * tidyr
 * dplyr
 

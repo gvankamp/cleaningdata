@@ -53,4 +53,8 @@ reduced.data %>% group_by(var.name, activity.code) %>%
 #create final dataset of computed averages
 final.data <- merge(activityAverage, subjectAverage, by.x = 'var.name', by.y = 'var.name')
 final.data <- merge(final.data, activity_labels, by.x = "activity.code", by.y = "activity.code")
-select(final.data,   var.name, activity.average, activity, subject, subject.average) -> final.data
+select(final.data,   var.name, activity.average, activity, subject, subject.average) %>% ungroup() -> final.data
+final.data$activity <- as.character(final.data$activity)
+
+#write table
+write.table(final.data, 'data.txt', row.names = F)
