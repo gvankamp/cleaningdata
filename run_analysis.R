@@ -43,12 +43,14 @@ merge(activity_labels, data, by.x = "activity.code", by.y = "activity") -> data
 #make a dataset with only standard deviation and means
 filter(data, grepl("std|mean", var.name)) -> reduced.data
 
+#calculate averages
 reduced.data %>% 
 group_by(subject, var.name) %>%
   summarise(subject.average = mean(measurement)) -> subjectAverage
-
-
 reduced.data %>% group_by(var.name, activity.code) %>%
   summarise(activity.average = mean(measurement)) -> activityAverage
 
+#create final dataset of computed averages
 final.data <- merge(activityAverage, subjectAverage, by.x = 'var.name', by.y = 'var.name')
+final.data <- merge(final.data, activity_labels, by.x = "activity.code", by.y = "activity.code")
+select(final.data,   var.name, activity.average, activity, subject, subject.average) -> final.data
