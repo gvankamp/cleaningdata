@@ -1,6 +1,8 @@
 'Extract and merge R data'
 '============================'
 
+#This scripts assumes, the packages 'dplyr' and 'tidyr' are loaded
+
 #read features, set to lower-case
 features <- read.table("features.txt", quote = "\"", comment.char = "", stringsAsFactors = F)
 features <- lapply(features, tolower)
@@ -31,12 +33,22 @@ rbind(testData, trainData) %>%
 gather(var.name, measurement, -subject, -activity) -> data
 
 #add nice activity labels to the dataset instead of just numbers
-colnames(activity_labels) <- c("code", "activity")
+colnames(activity_labels) <- c("activity.code", "activity")
 activity_labels$activity <- lapply(activity_labels$activity, tolower)
 
 #activity_labels$activity <- factor("walking", "walking_upstairs", "walking_downstairs", "sitting", "standing", "laying")
 
-merge(activity_labels, data, by.x = "code", by.y = "activity") -> data
+merge(activity_labels, data, by.x = "activity.code", by.y = "activity") -> data
 
 #make a dataset with only standard deviation and means
 filter(data, grepl("std|mean", var.name)) -> reduced.data
+
+reduced.data %>% 
+group_by(subject, var.name) %>%
+  summarise(subject.average = mean(measurement)) -> subjectAverage
+
+
+reduced.data %>% group_by(var.name, activity.code) %>%
+  summarise(activity.average = mean(measurement)) -> activityAverage
+
+final.data <- merge(activityAverage, subjectAverage, by.x = 'var.name', by.y = 'var.name')
